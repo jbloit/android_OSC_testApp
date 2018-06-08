@@ -31,10 +31,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val utils = Utils(this)
+        val broadCastAdress = utils.broadcastAddress
+
         thread(true, false, name="oscThread"){
 
             try {
-                oscPortOut = OSCPortOut(InetAddress.getByName(remoteIP), remotePort)
+                oscPortOut = OSCPortOut(InetAddress.getByName(broadCastAdress.hostAddress), remotePort)
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
             }
