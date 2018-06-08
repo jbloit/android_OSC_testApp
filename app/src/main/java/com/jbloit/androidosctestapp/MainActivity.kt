@@ -26,52 +26,22 @@ import com.illposed.osc.OSCPortIn
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "OSC_ACTIVITY"
-    
-    private val remotePort = 12345
-    private val localPort = 54321
+
+
 
     private lateinit var oscPortOut: OSCPortOut
+
+//    fun onMessage(){
+//        Log.d(TAG, "message received")
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val utils = Utils(this)
-        val broadCastAddress = utils.broadcastAddress
+        val task = OscSocket(this)
+        val thread1 = Thread(task)
+        thread1.start()
 
-        thread(true, false, name="oscThread"){
-
-            try {
-                oscPortOut = OSCPortOut(InetAddress.getByName(broadCastAddress.hostAddress), remotePort)
-            } catch (e: Exception) {
-                Log.e(TAG, e.toString())
-            }
-
-            var receiver = OSCPortIn(localPort)
-            val listener = OSCListener { time, message ->
-                println("Message received! ${message.arguments[0]}")
-
-            }
-            receiver.addListener("/sayhello", listener)
-            receiver.startListening()
-
-            while(true) {
-                Thread.sleep(1000)
-                if (oscPortOut != null){
-
-                    var message = OSCMessage()
-                    message.address = "/android"
-                    message.addArgument("hi")
-                    message.addArgument(12345)
-                    message.addArgument(1.2345.toFloat())
-
-                    try {
-                        oscPortOut.send(message)
-                    } catch (e: Exception) {
-                        Log.e(TAG, e.toString())
-                    }
-                }
-            }
-        }
     }
 }
