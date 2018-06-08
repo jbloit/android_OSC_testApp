@@ -6,6 +6,12 @@ import android.util.Log
 import com.illposed.osc.*
 import java.net.InetAddress
 import kotlin.concurrent.thread
+import com.illposed.osc.OSCMessage
+import com.illposed.osc.OSCListener
+import com.illposed.osc.OSCPort
+import com.illposed.osc.OSCPortIn
+
+
 
 
 /*
@@ -22,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "OSC_ACTIVITY"
     
     private val remotePort = 12345
+    private val localPort = 54321
 
     private lateinit var oscPortOut: OSCPortOut
 
@@ -39,6 +46,14 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
             }
+
+            var receiver = OSCPortIn(localPort)
+            val listener = OSCListener { time, message ->
+                println("Message received! ${message.arguments[0]}")
+
+            }
+            receiver.addListener("/sayhello", listener)
+            receiver.startListening()
 
             while(true) {
                 Thread.sleep(1000)
