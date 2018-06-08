@@ -20,9 +20,7 @@ import kotlin.concurrent.thread
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "OSC_ACTIVITY"
-
-    // remote host to send to:
-    private val remoteIP = "192.168.1.22"
+    
     private val remotePort = 12345
 
     private lateinit var oscPortOut: OSCPortOut
@@ -32,12 +30,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val utils = Utils(this)
-        val broadCastAdress = utils.broadcastAddress
+        val broadCastAddress = utils.broadcastAddress
 
         thread(true, false, name="oscThread"){
 
             try {
-                oscPortOut = OSCPortOut(InetAddress.getByName(broadCastAdress.hostAddress), remotePort)
+                oscPortOut = OSCPortOut(InetAddress.getByName(broadCastAddress.hostAddress), remotePort)
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
             }
