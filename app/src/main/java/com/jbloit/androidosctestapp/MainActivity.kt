@@ -23,12 +23,9 @@ import com.illposed.osc.OSCPortIn
 * */
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OscSocketListener {
 
     private val TAG = "OSC_ACTIVITY"
-
-
-
     private lateinit var oscPortOut: OSCPortOut
 
 //    fun onMessage(){
@@ -39,9 +36,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val task = OscSocket(this)
+        val task = OscSocket(this, this)
         val thread1 = Thread(task)
         thread1.start()
+    }
 
+    override fun receivedMessage(task: OscSocket, message: OSCMessage) {
+        Log.d(TAG, "received OSC message")
+        for (arg in message.arguments){
+            Log.d(TAG, "with arg ${arg}")
+        }
     }
 }
