@@ -6,6 +6,12 @@ import android.util.Log
 import com.illposed.osc.*
 import java.net.InetAddress
 import kotlin.concurrent.thread
+import com.illposed.osc.OSCMessage
+import com.illposed.osc.OSCListener
+import com.illposed.osc.OSCPort
+import com.illposed.osc.OSCPortIn
+
+
 
 
 /*
@@ -17,45 +23,28 @@ import kotlin.concurrent.thread
 * */
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OscSocketListener {
 
     private val TAG = "OSC_ACTIVITY"
-
-    // remote host to send to:
-    private val remoteIP = "192.168.1.22"
-    private val remotePort = 12345
-
     private lateinit var oscPortOut: OSCPortOut
+
+//    fun onMessage(){
+//        Log.d(TAG, "message received")
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        thread(true, false, name="oscThread"){
+        val task = OscSocket(this, this)
+        val thread1 = Thread(task)
+        thread1.start()
+    }
 
-            try {
-                oscPortOut = OSCPortOut(InetAddress.getByName(remoteIP), remotePort)
-            } catch (e: Exception) {
-                Log.e(TAG, e.toString())
-            }
-
-            while(true) {
-                Thread.sleep(1000)
-                if (oscPortOut != null){
-
-                    var message = OSCMessage()
-                    message.address = "/android"
-                    message.addArgument("hi")
-                    message.addArgument(12345)
-                    message.addArgument(1.2345.toFloat())
-
-                    try {
-                        oscPortOut.send(message)
-                    } catch (e: Exception) {
-                        Log.e(TAG, e.toString())
-                    }
-                }
-            }
+    override fun receivedMessage(task: OscSocket, message: OSCMessage) {
+        Log.d(TAG, "received OSC message")
+        for (arg in message.arguments){
+            Log.d(TAG, "with arg ${arg}")
         }
     }
 }
