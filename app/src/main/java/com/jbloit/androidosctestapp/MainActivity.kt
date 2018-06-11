@@ -2,6 +2,7 @@ package com.jbloit.androidosctestapp
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Message
 import android.util.Log
 import com.illposed.osc.*
 import java.net.InetAddress
@@ -10,8 +11,7 @@ import com.illposed.osc.OSCMessage
 import com.illposed.osc.OSCListener
 import com.illposed.osc.OSCPort
 import com.illposed.osc.OSCPortIn
-
-
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 /*
@@ -28,15 +28,20 @@ class MainActivity : AppCompatActivity(), OscSocketListener {
     private val TAG = "OSC_ACTIVITY"
     private lateinit var oscPortOut: OSCPortOut
 
-//    fun onMessage(){
-//        Log.d(TAG, "message received")
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val task = OscSocket(this, this)
+
+        button_thread.setOnClickListener(){
+
+            val message = Message()
+            message.what = OscSocket.WHAT_SENDMESSAGE
+            task.handler.sendMessage(message)
+        }
+
         val thread1 = Thread(task)
         thread1.start()
     }

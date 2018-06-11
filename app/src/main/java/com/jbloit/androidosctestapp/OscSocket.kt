@@ -24,12 +24,29 @@ class OscSocket (context: Context, private val listener: OscSocketListener): Run
 
     val broadCastAddress: InetAddress
 
-    private val handler = object : Handler(Looper.getMainLooper()) {
+     val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 WHAT_RECEIVEDMESSAGE -> {
                     val messageAsOSCmessage: OSCMessage = msg.obj as OSCMessage
                     listener.receivedMessage(this@OscSocket, messageAsOSCmessage)
+                    Log.d(TAG, Thread.currentThread().name)
+                }
+                WHAT_SENDMESSAGE -> {
+                    if (oscPortOut != null){
+
+                        var message = OSCMessage()
+                        message.address = "/android"
+                        message.addArgument("hi_from_SENDMESSAGE")
+                        message.addArgument(12345)
+                        message.addArgument(1.2345.toFloat())
+
+                        try {
+                            oscPortOut.send(message)
+                        } catch (e: Exception) {
+                            Log.e(TAG, e.toString())
+                        }
+                    }
                 }
             }
         }
@@ -84,7 +101,8 @@ class OscSocket (context: Context, private val listener: OscSocketListener): Run
     }
 
     companion object {
-        private val WHAT_RECEIVEDMESSAGE = 0
+        val WHAT_RECEIVEDMESSAGE = 0
+        val WHAT_SENDMESSAGE = 1
     }
 
 }
